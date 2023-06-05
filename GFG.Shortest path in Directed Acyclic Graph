@@ -1,0 +1,106 @@
+//{ Driver Code Starts
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Main {
+	public static void main(String[] args) throws IOException {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+		while (T-- > 0) {
+			int n = sc.nextInt();
+			int m = sc.nextInt();
+			int[][] edge = new int[m][3];
+			for (int i = 0; i < m; i++) {
+				edge[i][0] = sc.nextInt();
+				edge[i][1] = sc.nextInt();
+				edge[i][2] = sc.nextInt();
+			}
+			Solution obj = new Solution();
+			int res[] = obj.shortestPath(n, m,edge);
+			for (int i = 0; i < n; i++) {
+				System.out.print(res[i] + " ");
+			}
+			System.out.println();
+		}
+	}
+}
+// } Driver Code Ends
+
+
+//User function Template for Java
+class Pair{
+    int first,second;
+    Pair(int f,int s){
+        first = f;
+        second = s;
+    }
+}
+class Solution {
+    public void dfs(int node,int[] visited,ArrayList<ArrayList<Pair>> adj,Stack<Integer> stk){
+        visited[node]=1;
+        
+        for(int i=0;i<adj.get(node).size();i++){
+            int t1 = adj.get(node).get(i).first;
+            int t2 = adj.get(node).get(i).second;
+            if(visited[t1]==0){
+                dfs(t1,visited,adj,stk);
+            }
+        }
+        
+        stk.add(node);
+    }
+
+	public int[] shortestPath(int N,int M, int[][] edges) {
+		
+		// step 1 : Create adjacency List (ArrayList of Pairs)
+		
+		ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+		for(int i=0;i<N;i++) adj.add(new ArrayList<Pair>());
+		
+		for(int i=0;i<M;i++){
+		    int u = edges[i][0];
+		    int v = edges[i][1];
+		    int wt = edges[i][2];
+		    
+		    adj.get(u).add(new Pair(v,wt));
+		}
+		
+		// step 2 : Topological Sort
+		
+		int[] visited = new int[N];
+		Stack<Integer> stk= new Stack<>();
+		for(int i=0;i<N;i++){
+		    if(visited[i]==0){
+		        dfs(i,visited,adj,stk);
+		    }
+		}
+		
+		// step 3 : Calculating shortest distance
+		int[] answer = new int[N];
+		for(int i=0;i<N;i++){
+		    answer[i] = (int)(1e9);
+		}
+		int n = stk.size();
+		//source node
+		answer[0]=0;
+		for(int i=0;i<n;i++) {
+		    
+		    int temp = stk.pop();
+		    int dist = answer[temp];
+		    for(int j=0;j<adj.get(temp).size();j++){
+		        int v = adj.get(temp).get(j).first;
+		        int wt = adj.get(temp).get(j).second;
+		        
+		        if((dist+wt)<answer[v]){
+		            answer[v]=dist+wt;
+		        }
+		    }
+		    
+		}
+		for(int k=0;k<N;k++){
+		    if(answer[k]==(int)(1e9)) answer[k]=-1;
+		}
+		return answer;
+	}
+}
